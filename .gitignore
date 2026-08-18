@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environments
+env/
+venv/
+.venv/
+env3.*
+*venv*
+
+# Packaging / builds
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing / coverage
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.hypothesis/
+htmlcov/
+.coverage*
+coverage.xml
+
+# Documentation builds
+docs/_build/
+site/
+site_build/
+docs_build/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
+.idea/
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local files
+test.db
+log.txt
+.cache/
+
+# Deployment / tooling
+.netlify/
+.codspeed/
+
+# Archives / generated files
+docs.zip
+archive.zip
+
+# Vim / editor temporary files
+*~
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Emacs
+.projectile

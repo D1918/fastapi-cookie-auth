@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fastapi-oauth2-cookie"
+version = "0.0.1"
+description = "A lightweight FastAPI library for OAuth2 via HttpOnly Cookies and CSRF headers."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Denis Lyovin", email = "DOS1918@proton.me" },
+]
+dependencies = [
+    "fastapi>=0.95.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "httpx2>=2.12.0",
+    "fastapi[standard]>=0.141.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/D1918/fastapi-oauth2-cookie.git"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "1.md",
+    "uv.lock",
+    ".gitignore",
+    "tests/",
+    "dev/"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["fastapi_oauth2_cookie"]
