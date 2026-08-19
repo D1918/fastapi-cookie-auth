@@ -11,7 +11,7 @@ cookie_manager = AuthCookieManager(secure=False)
 oauth2_scheme = OAuth2PasswordCookie(
     tokenUrl="token",
     access_cookie_name=cookie_manager.access_cookie_name,
-    require_csrf=False,  # Disabled for easy Swagger UI testing
+    require_csrf=False,  # Disabled to allow testing through Swagger UI
 )
 
 FAKE_USERS_DB = {
