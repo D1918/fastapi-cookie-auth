@@ -59,11 +59,9 @@ async def login(
             detail="Incorrect username or password",
         )
 
-    # 1. Set the HttpOnly cookie for the browser
     cookie_manager.set_auth_cookies(response, access_token=user["username"])
 
-    # 2. Return standard OAuth2 JSON so Swagger UI works correctly
-    return {"access_token": user["username"], "token_type": "bearer"}
+    return {"access_token": user["username"]}
 
 
 @app.get("/users/me")
