@@ -26,8 +26,8 @@ class AuthCookieManager:
         response: Response,
         access_token: str,
         refresh_token: Optional[str] = None,
-        max_age_access: int = 900,
-        max_age_refresh: int = 604800,
+        max_age_access_seconds: int = 900,
+        max_age_refresh_seconds: int = 604800,
     ) -> None:
         """Sets auth cookies using the manager's global configuration."""
         response.set_cookie(
@@ -36,7 +36,7 @@ class AuthCookieManager:
             httponly=True,
             secure=self.secure,
             samesite=self.samesite,
-            max_age=max_age_access,
+            max_age=max_age_access_seconds,
         )
         if refresh_token:
             response.set_cookie(
@@ -46,7 +46,7 @@ class AuthCookieManager:
                 httponly=True,
                 secure=self.secure,
                 samesite=self.samesite,
-                max_age=max_age_refresh,
+                max_age=max_age_refresh_seconds,
             )
 
     def clear_auth_cookies(self, response: Response) -> None:
