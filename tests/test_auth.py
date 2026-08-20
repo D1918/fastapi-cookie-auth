@@ -5,12 +5,12 @@ from fastapi_oauth2_cookie import AuthCookieManager, OAuth2PasswordCookie
 app = FastAPI()
 
 cookie_manager = AuthCookieManager()
-oauth2_scheme_no_csrf = OAuth2PasswordCookie(tokenUrl="/login", require_csrf=False)
-oauth2_scheme_with_csrf = OAuth2PasswordCookie(tokenUrl="/login", require_csrf=True)
+oauth2_scheme_no_csrf = OAuth2PasswordCookie(tokenUrl="/sign-in", require_csrf=False)
+oauth2_scheme_with_csrf = OAuth2PasswordCookie(tokenUrl="/sign-in", require_csrf=True)
 
 
-@app.post("/login")
-def login(response: Response):
+@app.post("/sign-in")
+def sign_in(response: Response):
     cookie_manager.set_auth_cookies(
         response, access_token="super-secret-token", refresh_token="super-refresh-token"
     )
@@ -53,9 +53,9 @@ def test_missing_cookie_fails():
     assert response.json() == {"detail": "Not authenticated"}
 
 
-def test_successful_login_and_access_no_csrf():
+def test_successful_sign_in_and_access_no_csrf():
     client.cookies.clear()
-    client.post("/login")
+    client.post("/sign-in")
 
     response = client.get("/protected-no-csrf")
     assert response.status_code == 200
@@ -64,7 +64,7 @@ def test_successful_login_and_access_no_csrf():
 
 def test_csrf_required_but_missing():
     client.cookies.clear()
-    client.post("/login")
+    client.post("/sign-in")
 
     response = client.get("/protected-with-csrf")
 
@@ -74,7 +74,7 @@ def test_csrf_required_but_missing():
 
 def test_csrf_required_and_provided():
     client.cookies.clear()
-    client.post("/login")
+    client.post("/sign-in")
 
     headers = {"X-CSRF-TOKEN": "super-csrf-token"}
     response = client.get("/protected-with-csrf", headers=headers)
@@ -88,10 +88,10 @@ def test_csrf_required_and_provided():
 
 def test_refresh_token_set_and_accessible_on_correct_path():
     client.cookies.clear()
-    login_response = client.post("/login")
+    sign_in_response = client.post("/sign-in")
 
     # 1. Verify Set-Cookie headers contain both tokens
-    set_cookie_headers = login_response.headers.get_list("set-cookie")
+    set_cookie_headers = sign_in_response.headers.get_list("set-cookie")
     assert any(
         "ACCESS-TOKEN=super-secret-token" in cookie for cookie in set_cookie_headers
     )
@@ -109,7 +109,7 @@ def test_refresh_token_set_and_accessible_on_correct_path():
 def test_logout_clears_cookies():
     client.cookies.clear()
 
-    client.post("/login")
+    client.post("/sign-in")
     assert client.cookies.get(cookie_manager.access_cookie_name) == "super-secret-token"
 
     client.post("/logout")
