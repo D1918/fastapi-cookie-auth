@@ -13,6 +13,7 @@ router = APIRouter()
 cookie_manager = AuthCookieManager(
     secure=PRODUCTION_MODE,
     samesite="strict" if PRODUCTION_MODE else "lax",
+    refresh_path="/api/v1/auth/refresh-token",
 )
 
 
@@ -39,7 +40,7 @@ async def sign_in(
     return CSRFToken(csrf_token=tokens.csrf_token)
 
 
-@router.post(cookie_manager.refresh_path, response_model=CSRFToken)
+@router.post("/refresh-token", response_model=CSRFToken)
 async def refresh_token(
     response: Response,
     request: Request,

@@ -29,6 +29,7 @@ app = FastAPI()
 cookie_manager = AuthCookieManager(
     secure=False,  # Set to True in production (HTTPS)
     samesite="lax",
+	refresh_path="/api/v1/auth/refresh-token"
 )
 
 # 2. Configure the Dependency
@@ -82,8 +83,8 @@ async def sign_in(
     return {"csrf_token": csrf_token}
 
 
-@app.post(cookie_manager.refresh_path)
-async def refresh(request: Request, response: Response):
+@app.post("/refresh-token")
+async def refresh_token(request: Request, response: Response):
     # Extract the refresh token securely from the cookie
     refresh_token = request.cookies.get(cookie_manager.refresh_cookie_name)
 
@@ -146,7 +147,7 @@ Handles the global configuration and injection of `Set-Cookie` headers into your
 
 *   **`access_cookie_name`** (`str`): The name of the cookie storing the access token. *Default: `"ACCESS-TOKEN"`*
 *   **`refresh_cookie_name`** (`str`): The name of the cookie storing the refresh token. *Default: `"REFRESH-TOKEN"`*
-*   **`refresh_path`** (`str`): The URL path where the refresh cookie is sent. Restricting this path enhances security by preventing the refresh token from being sent to other endpoints. *Default: `"/refresh-token"`*
+*   **`refresh_path`** (`str`): The Absolute URL path where the refresh cookie is sent. Restricting this path enhances security by preventing the refresh token from being sent to other endpoints. *Default: `"/refresh-token"`*
 *   **`secure`** (`bool`): If `True`, cookies are only sent over HTTPS. Set this to `False` during local development. *Default: `True`*
 *   **`samesite`** (`"lax" | "strict" | "none"`): Controls cross-site request forgery (CSRF) protection at the browser level. `"strict"` is highly recommended for production if your frontend and API share the same site. *Default: `"lax"`*
 
