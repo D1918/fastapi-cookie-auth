@@ -28,7 +28,7 @@ app = FastAPI()
 # 1. Initialize the Cookie Manager
 cookie_manager = AuthCookieManager(
     secure=False,  # Set to True in production (HTTPS)
-    samesite="lax",  # "strict" is much more preferable in production
+    samesite="lax",
 )
 
 # 2. Configure the Dependency
