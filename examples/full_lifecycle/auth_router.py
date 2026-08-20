@@ -39,7 +39,7 @@ async def sign_in(
     return CSRFToken(csrf_token=tokens.csrf_token)
 
 
-@router.post("/refresh-token", response_model=CSRFToken)
+@router.post(cookie_manager.refresh_path, response_model=CSRFToken)
 async def refresh_token(
     response: Response,
     request: Request,

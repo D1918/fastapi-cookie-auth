@@ -13,7 +13,7 @@ uv add fastapi-oauth2-cookie
 
 ## Quickstart
 
-This example demonstrates login, logout, and token extraction.
+This example demonstrates sign-in, sign-out, and token extraction.
 
 **Note:** This library handles the *extraction and presence* of cookies. You are responsible for cryptographically validating the token (e.g., verifying JWT signatures) inside your `get_current_user` dependency.
 
@@ -27,80 +27,91 @@ app = FastAPI()
 
 # 1. Initialize the Cookie Manager
 cookie_manager = AuthCookieManager(
-    secure=False, # Set to True in production (HTTPS)
-    samesite="lax" # "strict" is much more preferable production
+    secure=False,  # Set to True in production (HTTPS)
+    samesite="lax",  # "strict" is much more preferable in production
 )
 
 # 2. Configure the Dependency
-oauth2_scheme = OAuth2PasswordCookie(
-    tokenUrl="/login",
-    require_csrf=False
+oauth2_scheme = OAuth2PasswordCookie(tokenUrl="/sign-in", require_csrf=False)
+
+# Dummy tokens
+valid_tokens = (
+    "fake-access-token",
+    "new-fake-access-token",
+    "fake-refresh-token",
+    "new-fake-refresh-token",
 )
+
 
 # 3. User extraction and token validation
 async def get_current_user(tokens: Tokens = Depends(oauth2_scheme)):
-    # IN REALITY: Validate your JWT here
-    valid_tokens = ("fake-jwt-token", "new-fake-jwt-token")
     if not tokens.access_token or tokens.access_token not in valid_tokens:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired access token",
         )
-        
-    return "user_id_123" # Dummy user id
 
-@app.post("/login")
-async def login(
-    response: Response, 
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    return "user_id_123"  # Dummy user id
+
+
+@app.post("/sign-in")
+async def sign_in(
+    response: Response, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
     # Verify credentials (mocked)
-    if form_data.username != "admin" or form_data.password != "secret":
+    if form_data.username != "johndoe" or form_data.password != "johndoe":
         raise HTTPException(status_code=400, detail="Incorrect credentials")
 
     # Generate tokens
-    access_token = "fake-jwt-token"
+    access_token = "fake-access-token"
     refresh_token = "fake-refresh-token"
     csrf_token = "fake-csrf-token"
 
     # 4. Set Both HttpOnly cookies
     cookie_manager.set_auth_cookies(
-        response, 
+        response,
         access_token=access_token,
-        refresh_token=refresh_token
+        refresh_token=refresh_token,
+        max_age_access_seconds=900,
+        max_age_refresh_seconds=604800,
     )
-    
+
     return {"csrf_token": csrf_token}
 
-# 5. The Refresh Endpoint
-@app.post("/refresh")
+
+@app.post(cookie_manager.refresh_path)
 async def refresh(request: Request, response: Response):
     # Extract the refresh token securely from the cookie
     refresh_token = request.cookies.get(cookie_manager.refresh_cookie_name)
-    
+
     # IN REALITY: Validate the refresh token against your DB/JWT secret
-    if not refresh_token or refresh_token != "fake-refresh-token":
+    if not refresh_token or refresh_token not in valid_tokens:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
     # Issue new tokens (rotation)
-    new_access_token = "new-fake-jwt-token"
+    new_access_token = "new-fake-access-token"
     new_csrf_token = "new-fake-csrf-token"
+    new_refresh_token = "new-fake-refresh-token"
 
     # Overwrite the old cookies with the new access token
     cookie_manager.set_auth_cookies(
-        response, 
+        response,
         access_token=new_access_token,
-        refresh_token=refresh_token # Or issue a new one if rotating refresh tokens
+        refresh_token=new_refresh_token,
+        max_age_access_seconds=900,
+        max_age_refresh_seconds=604800,
     )
-    
+
     return {"csrf_token": new_csrf_token}
+
 
 @app.get("/users/me")
 async def read_users_me(current_user: str = Depends(get_current_user)):
     return {"user_id": current_user}
 
-@app.post("/logout")
-def logout(response: Response):
+
+@app.post("/sign-out")
+def sign_out(response: Response):
     # Clears both access and refresh cookies
     cookie_manager.clear_auth_cookies(response)
     return {"message": "Logged out successfully"}
