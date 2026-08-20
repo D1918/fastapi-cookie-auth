@@ -161,7 +161,7 @@ The FastAPI dependency injected into your protected routes. It extracts the acce
 
 **Initialization Parameters:**
 
-*   **`tokenUrl`** (`str`): The endpoint URL where the user authenticates (e.g., `"/sign-in"`). This is required for FastAPI's automated Swagger UI to work correctly.
+*   **`tokenUrl`** (`str`): The endpoint URL where the user authenticates (e.g., `"/sign-in"`).
 *   **`require_csrf`** (`bool`): If `True`, the dependency will strictly enforce the presence of the CSRF header. *Default: `True`*
 *   **`access_cookie_name`** (`str`): Must match the `access_cookie_name` used in your `AuthCookieManager`. *Default: `"ACCESS-TOKEN"`*
 *   **`csrf_header_name`** (`str`): The HTTP header the dependency looks for to extract the CSRF token. *Default: `"X-CSRF-TOKEN"`*
