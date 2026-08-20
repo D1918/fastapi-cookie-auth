@@ -32,7 +32,10 @@ cookie_manager = AuthCookieManager(
 )
 
 # 2. Configure the Dependency
-oauth2_scheme = OAuth2PasswordCookie(tokenUrl="/sign-in", require_csrf=False)
+oauth2_scheme = OAuth2PasswordCookie(
+    tokenUrl="/sign-in",
+    require_csrf=False,  # Set to True in production
+)
 
 # Dummy tokens
 valid_tokens = (
