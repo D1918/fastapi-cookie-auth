@@ -256,6 +256,6 @@ When you initialize `OAuth2CookieScheme` or `SessionCookieScheme` with `require_
 
 This package is fully compatible with FastAPI’s Swagger UI. OAuth2-based authentication is supported both through the sign-in route and the Swagger UI’s “Authorize” button, while session-based authentication requires users to authenticate through the sign-in route.
 
-* **The Catch:** If `require_csrf=True`, Swagger UI's "Try it out" feature will fail with `401 Unauthorized`. Swagger does not natively know how to extract or attach your custom `X-CSRF-TOKEN` header. You will need to disable CSRF requirements in your dev/swagger environment or inject custom JS into the Swagger template to handle the header.
+* **The Catch:** If `require_csrf=True`, Swagger UI's "Try it out" feature will fail with `401 Unauthorized`. Swagger does not natively know how to extract or attach your custom `X-CSRF-TOKEN` header.
 
 * **Solution:** Disable CSRF protection when running outside production by setting `require_csrf=False` in development. This keeps Swagger UI usable locally while ensuring CSRF protection remains enabled in production.
