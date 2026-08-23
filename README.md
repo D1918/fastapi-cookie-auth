@@ -122,7 +122,7 @@ def sign_out(response: Response):
 
 ### Option 2: Session Authentication
 
-If you prefer a standard session cookie without the complexity of refresh tokens, use the Session classes. This registers natively as an `APIKey` cookie in your OpenAPI schema.
+If you prefer a standard session cookie without the complexity of refresh tokens, use the Session Authentication. This registers natively as an `APIKey` cookie in your OpenAPI schema.
 
 ```python
 from fastapi import Depends, FastAPI, HTTPException, Response, status
@@ -171,21 +171,6 @@ def logout(response: Response):
     return {"message": "Logged out"}
 
 ```
-
-## Technical Caveats
-
-### CSRF Implementation
-
-When you initialize `OAuth2CookieScheme` or `SessionCookieScheme` with `require_csrf=True`, the dependency will strictly enforce the presence of the `X-CSRF-TOKEN` header.
-
-* **The Catch:** This library does *not* issue CSRF tokens. You must generate the CSRF token and deliver it to your frontend yourself (e.g., via a standard, non-HttpOnly cookie or a separate meta endpoint) so the client can read it and attach it to subsequent API headers.
-
-### Swagger UI Compatibility
-
-This package is fully compatible with FastAPI’s Swagger UI. Authentication is supported both through the sign-in route and via the “Authorize” button in the Swagger UI.
-
-* **The Catch:** If `require_csrf=True`, Swagger UI's "Try it out" feature will fail with `401 Unauthorized`. Swagger does not natively know how to extract or attach your custom `X-CSRF-TOKEN` header. You will need to disable CSRF requirements in your dev/swagger environment or inject custom JS into the Swagger template to handle the header.
-* **Solution:** Disable CSRF protection when running outside production by setting `require_csrf=False` in development. This keeps Swagger UI usable locally while ensuring CSRF protection remains enabled in production.
 
 ## Core API
 
@@ -257,3 +242,20 @@ The FastAPI dependency injected into your protected routes. Extracts the session
 
 **Returns:** A `SessionCredentials` named tuple containing `(session_id, csrf_token)`.
 
+## Technical Caveats
+
+### CSRF Implementation
+
+When you initialize `OAuth2CookieScheme` or `SessionCookieScheme` with `require_csrf=True`, the dependency will strictly enforce the presence of the `X-CSRF-TOKEN` header.
+
+* **The Catch:** This library does *not* issue CSRF tokens. 
+
+* **Solution:** You must generate the CSRF token and deliver it to your frontend yourself (e.g., via sign-in endpoint) so the client can read it and attach it to subsequent API headers.
+
+### Swagger UI Compatibility
+
+This package is fully compatible with FastAPI’s Swagger UI. OAuth2-based authentication is supported both through the sign-in route and the Swagger UI’s “Authorize” button, while session-based authentication requires users to authenticate through the sign-in route.
+
+* **The Catch:** If `require_csrf=True`, Swagger UI's "Try it out" feature will fail with `401 Unauthorized`. Swagger does not natively know how to extract or attach your custom `X-CSRF-TOKEN` header. You will need to disable CSRF requirements in your dev/swagger environment or inject custom JS into the Swagger template to handle the header.
+
+* **Solution:** Disable CSRF protection when running outside production by setting `require_csrf=False` in development. This keeps Swagger UI usable locally while ensuring CSRF protection remains enabled in production.
