@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException, status
-from fastapi_oauth2_cookie import OAuth2PasswordCookie, Tokens
+from fastapi_cookie_auth.oauth2 import OAuth2CookieScheme, Tokens
 
-from examples.full_lifecycle.settings import PRODUCTION_MODE
+from examples.oauth2_full_lifecycle.settings import PRODUCTION_MODE
 from .auth_service import WebAuthService
 
-oauth2_scheme = OAuth2PasswordCookie(
+oauth2_scheme = OAuth2CookieScheme(
     tokenUrl="/sign-in",
     require_csrf=PRODUCTION_MODE,
 )

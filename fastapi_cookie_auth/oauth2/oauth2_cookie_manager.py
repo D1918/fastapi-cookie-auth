@@ -2,7 +2,7 @@ from typing import Literal, Optional
 from fastapi import Response
 
 
-class AuthCookieManager:
+class OAuth2CookieManager:
     """
     Basic auth cookie management
     """

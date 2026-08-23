@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, Request, Response, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi_oauth2_cookie import AuthCookieManager
+from fastapi_cookie_auth.oauth2 import OAuth2CookieManager
 
 from .settings import PRODUCTION_MODE
 from .schemas import CSRFToken
@@ -10,7 +10,7 @@ from .user_dependencies import get_auth_service
 
 router = APIRouter()
 
-cookie_manager = AuthCookieManager(
+cookie_manager = OAuth2CookieManager(
     secure=PRODUCTION_MODE,
     samesite="strict" if PRODUCTION_MODE else "lax",
     refresh_path="/api/v1/auth/refresh-token",

@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/fastapi-oauth2-cookie
+      url: https://pypi.org/p/fastapi-cookie-auth
     permissions:
       id-token: write    
     steps:

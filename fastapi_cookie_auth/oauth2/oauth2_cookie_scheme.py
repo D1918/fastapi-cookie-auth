@@ -10,7 +10,7 @@ class Tokens(NamedTuple):
     csrf_token: Optional[str]
 
 
-class OAuth2PasswordCookie(OAuth2):
+class OAuth2CookieScheme(OAuth2):
     """
     OAuth2 security scheme that extracts the access token from an HttpOnly cookie
     and the CSRF token from a custom header.

@@ -2,13 +2,13 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from fastapi_oauth2_cookie import AuthCookieManager, OAuth2PasswordCookie, Tokens
+from fastapi_cookie_auth.oauth2 import OAuth2CookieManager, OAuth2CookieScheme, Tokens
 
-app = FastAPI(title="Dev App - fastapi-oauth2-cookie")
+app = FastAPI(title="Dev App - OAuth2 ")
 
-cookie_manager = AuthCookieManager(secure=False)
+cookie_manager = OAuth2CookieManager(secure=False)
 
-oauth2_scheme = OAuth2PasswordCookie(
+oauth2_scheme = OAuth2CookieScheme(
     tokenUrl="token",
     access_cookie_name=cookie_manager.access_cookie_name,
     require_csrf=False,  # Disabled to allow testing through Swagger UI

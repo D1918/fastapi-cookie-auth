@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from fastapi.testclient import TestClient
-from fastapi_oauth2_cookie import AuthCookieManager, OAuth2PasswordCookie
+from fastapi_cookie_auth.oauth2 import OAuth2CookieManager, OAuth2CookieScheme
 
 app = FastAPI()
 
-cookie_manager = AuthCookieManager()
-oauth2_scheme_no_csrf = OAuth2PasswordCookie(tokenUrl="/sign-in", require_csrf=False)
-oauth2_scheme_with_csrf = OAuth2PasswordCookie(tokenUrl="/sign-in", require_csrf=True)
+cookie_manager = OAuth2CookieManager()
+oauth2_scheme_no_csrf = OAuth2CookieScheme(tokenUrl="/sign-in", require_csrf=False)
+oauth2_scheme_with_csrf = OAuth2CookieScheme(tokenUrl="/sign-in", require_csrf=True)
 
 
 @app.post("/sign-in")
@@ -90,7 +90,6 @@ def test_refresh_token_set_and_accessible_on_correct_path():
     client.cookies.clear()
     sign_in_response = client.post("/sign-in")
 
-    # 1. Verify Set-Cookie headers contain both tokens
     set_cookie_headers = sign_in_response.headers.get_list("set-cookie")
     assert any(
         "ACCESS-TOKEN=super-secret-token" in cookie for cookie in set_cookie_headers
@@ -100,7 +99,6 @@ def test_refresh_token_set_and_accessible_on_correct_path():
     )
     assert any("Path=/refresh-token" in cookie for cookie in set_cookie_headers)
 
-    # 2. Hitting the refresh route should succeed because the client sends the refresh cookie
     refresh_response = client.post("/refresh-token")
     assert refresh_response.status_code == 200
     assert refresh_response.json() == {"refresh_token": "super-refresh-token"}
