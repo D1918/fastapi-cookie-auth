@@ -40,7 +40,6 @@ async def get_current_user(credentials: SessionCredentials = Depends(session_sch
             detail="Invalid or expired session",
         )
 
-    # Fetch the actual user data
     user = FAKE_USERS_DB.get(username)
     if not user:
         raise HTTPException(
@@ -74,13 +73,10 @@ async def login(response: Response, login_data: LoginRequest):
             detail="Incorrect username or password",
         )
 
-    # Generate a random session ID
     session_id = str(uuid.uuid4())
 
-    # Store the session ID in our "database"
     FAKE_SESSIONS_DB[session_id] = user["username"]
 
-    # Set the cookie on the response
     session_manager.set_cookie(response, session_id=session_id)
 
     return {"message": "Successfully logged in"}
@@ -95,10 +91,8 @@ async def read_users_me(current_user: dict = Depends(get_current_user)):
 def logout(
     response: Response, credentials: SessionCredentials = Depends(session_scheme)
 ):
-    # 1. Clear the cookie from the browser
     session_manager.clear_cookie(response)
 
-    # 2. Invalidate the session on the server
     if credentials.session_id in FAKE_SESSIONS_DB:
         del FAKE_SESSIONS_DB[credentials.session_id]
 

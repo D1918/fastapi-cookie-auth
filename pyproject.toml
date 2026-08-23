@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fastapi-cookie-auth"
-version = "1.0.0"
+version = "1.0.1"
 description = "A lightweight FastAPI library for secure cookie-based authentication, supporting both OAuth2 and Sessions with built-in CSRF protection."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"

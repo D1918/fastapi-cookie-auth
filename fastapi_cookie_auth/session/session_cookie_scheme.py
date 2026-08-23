@@ -30,7 +30,7 @@ class SessionCookieScheme(APIKeyCookie):
         self.csrf_header_name = csrf_header_name
         self.require_csrf = require_csrf
 
-    async def __call__(self, request: Request) -> Optional[SessionCredentials]:
+    async def __call__(self, request: Request) -> Optional[SessionCredentials]:  # type: ignore[override]
         session_id = request.cookies.get(self.cookie_name)
         csrf_token = (
             request.headers.get(self.csrf_header_name) if self.require_csrf else None
