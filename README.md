@@ -30,10 +30,10 @@ from fastapi_cookie_auth import OAuth2CookieManager, OAuth2CookieScheme, Tokens
 app = FastAPI()
 
 # 1. Initialize the Cookie Manager
-cookie_manager = OAuth2CookieManager(
+oauth2_manager = OAuth2CookieManager(
     secure=False,  # Set to True in production (HTTPS)
     samesite="lax",
-    refresh_path="/api/v1/auth/refresh-token"
+    refresh_path="/refresh-token",  # this path should be the same as router' refresh path
 )
 
 # 2. Configure the Dependency
@@ -50,6 +50,7 @@ valid_tokens = (
     "new-fake-refresh-token",
 )
 
+
 # 3. User extraction and token validation
 async def get_current_user(tokens: Tokens = Depends(oauth2_scheme)):
     if not tokens.access_token or tokens.access_token not in valid_tokens:
@@ -58,6 +59,7 @@ async def get_current_user(tokens: Tokens = Depends(oauth2_scheme)):
             detail="Invalid or expired access token",
         )
     return "user_id_123"  # Dummy user id
+
 
 @app.post("/sign-in")
 async def sign_in(
@@ -73,7 +75,7 @@ async def sign_in(
     csrf_token = "fake-csrf-token"
 
     # 4. Set Both HttpOnly cookies
-    cookie_manager.set_auth_cookies(
+    oauth2_manager.set_auth_cookies(
         response,
         access_token=access_token,
         refresh_token=refresh_token,
@@ -83,10 +85,11 @@ async def sign_in(
 
     return {"csrf_token": csrf_token}
 
+
 @app.post("/refresh-token")
 async def refresh_token(request: Request, response: Response):
     # Extract the refresh token securely from the cookie
-    refresh_token = request.cookies.get(cookie_manager.refresh_cookie_name)
+    refresh_token = request.cookies.get(oauth2_manager.refresh_cookie_name)
 
     # IN REALITY: Validate the refresh token against your DB/JWT secret
     if not refresh_token or refresh_token not in valid_tokens:
@@ -98,7 +101,7 @@ async def refresh_token(request: Request, response: Response):
     new_refresh_token = "new-fake-refresh-token"
 
     # Overwrite the old cookies with the new access token
-    cookie_manager.set_auth_cookies(
+    oauth2_manager.set_auth_cookies(
         response,
         access_token=new_access_token,
         refresh_token=new_refresh_token,
@@ -108,16 +111,17 @@ async def refresh_token(request: Request, response: Response):
 
     return {"csrf_token": new_csrf_token}
 
+
 @app.get("/users/me")
 async def read_users_me(current_user: str = Depends(get_current_user)):
     return {"user_id": current_user}
 
+
 @app.post("/sign-out")
 def sign_out(response: Response):
     # Clears both access and refresh cookies
-    cookie_manager.clear_auth_cookies(response)
+    oauth2_manager.clear_auth_cookies(response)
     return {"message": "Logged out successfully"}
-
 ```
 
 ### Option 2: Session Authentication
@@ -126,20 +130,30 @@ If you prefer a standard session cookie without the complexity of refresh tokens
 
 ```python
 from fastapi import Depends, FastAPI, HTTPException, Response, status
-from fastapi_cookie_auth import SessionCookieManager, SessionCookieScheme, SessionCredentials
+from pydantic import BaseModel
+from fastapi_cookie_auth import (
+    SessionCookieManager,
+    SessionCookieScheme,
+    SessionCredentials,
+)
 
 app = FastAPI()
 
 # 1. Initialize the Session Manager
 session_manager = SessionCookieManager(
-    secure=False, # Set to True in production
-    samesite="lax"
+    secure=False, samesite="lax"  # Set to True in production
 )
 
 # 2. Configure the Dependency
 session_scheme = SessionCookieScheme(
-    require_csrf=False, # Set to True in production
+    require_csrf=False,  # Set to True in production
 )
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
 
 # 3. Session extraction and validation
 async def get_session_user(credentials: SessionCredentials = Depends(session_scheme)):
@@ -151,25 +165,30 @@ async def get_session_user(credentials: SessionCredentials = Depends(session_sch
         )
     return "user_id_456"
 
-@app.post("/login")
-async def login(response: Response):
+
+@app.post("/sign-in")
+async def login(response: Response, login_data: LoginRequest):
+    if login_data.username != "johndoe" or login_data.password != "johndoe":
+        raise HTTPException(status_code=400, detail="Incorrect credentials")
+
     session_id = "valid-session-id"
     csrf_token = "fake-csrf-token"
-    
+
     # 4. Set the session cookie
     session_manager.set_cookie(response, session_id=session_id)
     return {"csrf_token": csrf_token}
 
+
 @app.get("/profile")
 async def profile(user_id: str = Depends(get_session_user)):
     return {"user_id": user_id}
-    
-@app.post("/logout")
+
+
+@app.post("/sign-out")
 def logout(response: Response):
     # IN REALITY: Also delete the session from your database/Redis here
     session_manager.clear_cookie(response)
     return {"message": "Logged out"}
-
 ```
 
 ## Core API
@@ -182,11 +201,11 @@ Handles the global configuration and injection of `Set-Cookie` headers into your
 
 **Initialization Parameters:**
 
-* **`access_cookie_name`** (`str`): The name of the cookie storing the access token. *Default: `"ACCESS-TOKEN"*`
-* **`refresh_cookie_name`** (`str`): The name of the cookie storing the refresh token. *Default: `"REFRESH-TOKEN"*`
-* **`refresh_path`** (`str`): The Absolute URL path where the refresh cookie is sent. Restricting this path enhances security by preventing the refresh token from being sent to other endpoints. *Default: `"/refresh-token"*`
-* **`secure`** (`bool`): If `True`, cookies are only sent over HTTPS. Set this to `False` during local development. *Default: `True*`
-* **`samesite`** (`"lax" | "strict" | "none"`): Controls cross-site request forgery (CSRF) protection at the browser level. `"strict"` is highly recommended for production if your frontend and API share the same site. *Default: `"lax"*`
+* **`access_cookie_name`** (`str`): The name of the cookie storing the access token. *Default*: `"ACCESS-TOKEN"`
+* **`refresh_cookie_name`** (`str`): The name of the cookie storing the refresh token. *Default*: `"REFRESH-TOKEN"`
+* **`refresh_path`** (`str`): The Absolute URL path where the refresh cookie is sent. Restricting this path enhances security by preventing the refresh token from being sent to other endpoints. *Default*: `"/refresh-token"`
+* **`secure`** (`bool`): If `True`, cookies are only sent over HTTPS. Set this to `False` during local development. *Default*: `True`
+* **`samesite`** (`"lax" | "strict" | "none"`): Controls cross-site request forgery (CSRF) protection at the browser level. `"strict"` is highly recommended for production if your frontend and API share the same site. *Default*: `"lax"`
 
 **Methods:**
 
@@ -200,12 +219,12 @@ The FastAPI dependency injected into your protected routes. Extracts the access 
 **Initialization Parameters:**
 
 * **`tokenUrl`** (`str`): The endpoint URL where the user authenticates (e.g., `"/sign-in"`).
-* **`require_csrf`** (`bool`): If `True`, the dependency will strictly enforce the presence of the CSRF header. *Default: `True*`
-* **`access_cookie_name`** (`str`): Must match the `access_cookie_name` used in your `OAuth2CookieManager`. *Default: `"ACCESS-TOKEN"*`
-* **`csrf_header_name`** (`str`): The HTTP header the dependency looks for to extract the CSRF token. *Default: `"X-CSRF-TOKEN"*`
+* **`require_csrf`** (`bool`): If `True`, the dependency will strictly enforce the presence of the CSRF header. *Default*: `True`
+* **`access_cookie_name`** (`str`): Must match the `access_cookie_name` used in your `OAuth2CookieManager`. *Default*: `"ACCESS-TOKEN"`
+* **`csrf_header_name`** (`str`): The HTTP header the dependency looks for to extract the CSRF token. *Default*: `"X-CSRF-TOKEN"`
 * **`scheme_name`** (`str`, optional): Override the default scheme name used in OpenAPI documentation.
 * **`scopes`** (`dict`, optional): A dictionary of OAuth2 scopes to define permissions.
-* **`auto_error`** (`bool`): If `True`, automatically raises a `401 Unauthorized` exception if required tokens are missing. If `False`, it returns `None`. *Default: `True*`
+* **`auto_error`** (`bool`): If `True`, automatically raises a `401 Unauthorized` exception if required tokens are missing. If `False`, it returns `None`. *Default*: `True`
 
 **Returns:** A `Tokens` named tuple containing `(access_token, csrf_token)`.
 
@@ -219,9 +238,9 @@ Handles the global configuration and injection of `Set-Cookie` headers for sessi
 
 **Initialization Parameters:**
 
-* **`cookie_name`** (`str`): The name of the cookie storing the session ID. *Default: `"SESSION-ID"*`
-* **`secure`** (`bool`): If `True`, cookies are only sent over HTTPS. *Default: `True*`
-* **`samesite`** (`"lax" | "strict" | "none"`): Controls CSRF protection. *Default: `"lax"*`
+* **`cookie_name`** (`str`): The name of the cookie storing the session ID. *Default*: `"SESSION-ID"`
+* **`secure`** (`bool`): If `True`, cookies are only sent over HTTPS. *Default*: `True`
+* **`samesite`** (`"lax" | "strict" | "none"`): Controls CSRF protection. *Default*: `"lax"`
 
 **Methods:**
 
@@ -234,11 +253,11 @@ The FastAPI dependency injected into your protected routes. Extracts the session
 
 **Initialization Parameters:**
 
-* **`require_csrf`** (`bool`): If `True`, strictly enforces the CSRF header. *Default: `True*`
-* **`cookie_name`** (`str`): Must match the `cookie_name` in your manager. *Default: `"SESSION-ID"*`
-* **`csrf_header_name`** (`str`): The HTTP header for the CSRF token. *Default: `"X-CSRF-TOKEN"*`
+* **`require_csrf`** (`bool`): If `True`, strictly enforces the CSRF header. *Default*: `True`
+* **`cookie_name`** (`str`): Must match the `cookie_name` in your manager. *Default*: `"SESSION-ID"`
+* **`csrf_header_name`** (`str`): The HTTP header for the CSRF token. *Default*: `"X-CSRF-TOKEN"`
 * **`scheme_name`** (`str`, optional): Override the OpenAPI scheme name.
-* **`auto_error`** (`bool`): Raise `401` on missing credentials or return `None`. *Default: `True*`
+* **`auto_error`** (`bool`): Raise `401` on missing credentials or return `None`. *Default*: `True`
 
 **Returns:** A `SessionCredentials` named tuple containing `(session_id, csrf_token)`.
 
