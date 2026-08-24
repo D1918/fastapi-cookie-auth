@@ -277,4 +277,4 @@ This package is fully compatible with FastAPI’s Swagger UI. OAuth2-based authe
 
 * **The Catch:** If `require_csrf=True`, Swagger UI's "Try it out" feature will fail with `401 Unauthorized`. Swagger does not natively know how to extract or attach your custom `X-CSRF-TOKEN` header.
 
-* **Solution:** Disable CSRF protection when running outside production by setting `require_csrf=False` in development. This keeps Swagger UI usable locally while ensuring CSRF protection remains enabled in production.
+* **Solution:** Configure CSRF protection based on the environment—disable it in development by setting `require_csrf=False` and enable it in production. This keeps Swagger UI usable locally while maintaining CSRF protection where it matters.
