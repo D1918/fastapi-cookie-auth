@@ -203,7 +203,7 @@ Handles the global configuration and injection of `Set-Cookie` headers into your
 
 * **`access_cookie_name`** (`str`): The name of the cookie storing the access token. *Default*: `"ACCESS-TOKEN"`
 * **`refresh_cookie_name`** (`str`): The name of the cookie storing the refresh token. *Default*: `"REFRESH-TOKEN"`
-* **`refresh_path`** (`str`): The Absolute URL path where the refresh cookie is sent. Restricting this path enhances security by preventing the refresh token from being sent to other endpoints. *Default*: `"/refresh-token"`. This must exactly match the path of your FastAPI refresh route.
+* **`refresh_path`** (`str`): The Absolute URL path where the refresh cookie is sent. Restricting this path enhances security by preventing the refresh token from being sent to other endpoints. *Default*: `"/refresh-token"`. This must match exactly the path of your FastAPI refresh route.
 * **`secure`** (`bool`): If `True`, cookies are only sent over HTTPS. Set this to `False` during local development. *Default*: `True`
 * **`samesite`** (`"lax" | "strict" | "none"`): Controls cross-site request forgery (CSRF) protection at the browser level. `"strict"` is highly recommended for production if your frontend and API share the same site. *Default*: `"lax"`
 
