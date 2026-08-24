@@ -150,7 +150,7 @@ session_scheme = SessionCookieScheme(
 )
 
 
-class LoginRequest(BaseModel):
+class SignInRequest(BaseModel):
     username: str
     password: str
 
@@ -167,8 +167,8 @@ async def get_session_user(credentials: SessionCredentials = Depends(session_sch
 
 
 @app.post("/sign-in")
-async def login(response: Response, login_data: LoginRequest):
-    if login_data.username != "johndoe" or login_data.password != "johndoe":
+async def sign_in(response: Response, user_data: SignInRequest):
+    if user_data.username != "johndoe" or user_data.password != "johndoe":
         raise HTTPException(status_code=400, detail="Incorrect credentials")
 
     session_id = "valid-session-id"
@@ -185,7 +185,7 @@ async def profile(user_id: str = Depends(get_session_user)):
 
 
 @app.post("/sign-out")
-def logout(response: Response):
+def sign_out(response: Response):
     # IN REALITY: Also delete the session from your database/Redis here
     session_manager.clear_cookie(response)
     return {"message": "Logged out"}
