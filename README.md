@@ -141,7 +141,8 @@ app = FastAPI()
 
 # 1. Initialize the Session Manager
 session_manager = SessionCookieManager(
-    secure=False, samesite="lax"  # Set to True in production
+    secure=False, # Set to True in production
+    samesite="lax",
 )
 
 # 2. Configure the Dependency
