@@ -2,6 +2,11 @@
 
 A lightweight FastAPI library for secure cookie-based authentication, supporting both OAuth2 flows and standard Sessions with built-in CSRF enforcement. Zero third-party dependencies, with familiar patterns and APIs.
 
+## Requirements
+
+* **Python**: >= 3.10
+* **FastAPI**: >= 0.95.0
+
 ## Installation
 
 ```bash
