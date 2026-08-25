@@ -1,6 +1,6 @@
 # FastAPI Cookie Auth
 
-A lightweight FastAPI library for secure cookie-based authentication, supporting both OAuth2 flows and standard Sessions with built-in CSRF protection. Zero third-party dependencies outside of FastAPI.
+A lightweight FastAPI library for secure cookie-based authentication, supporting both OAuth2 flows and standard Sessions with built-in CSRF enforcement. Zero third-party dependencies outside of FastAPI.
 
 ## Installation
 
@@ -277,4 +277,21 @@ This package is fully compatible with FastAPI’s Swagger UI. OAuth2-based authe
 
 * **The Catch:** If `require_csrf=True`, Swagger UI's "Try it out" feature will fail with `401 Unauthorized`. Swagger does not natively know how to extract or attach your custom `X-CSRF-TOKEN` header.
 
-* **Solution:** Configure CSRF protection based on the environment—disable it in development by setting `require_csrf=False` and enable it in production. This keeps Swagger UI usable locally while maintaining CSRF protection where it matters.
+* **Solution:** Configure CSRF enforcement based on the environment—disable it in development by setting `require_csrf=False` and enable it in production. This keeps Swagger UI usable locally while maintaining CSRF protection where it matters.
+
+## What This Library Does Not Do
+
+This package is intentionally not a complete authentication framework. It provides the browser-facing authentication layer while leaving your application's authentication logic and data management under your control.
+
+### It does not:
+
+* create, manage, or update users
+* hash or verify passwords
+* create, validate, or update JWTs
+* create, validate, update, or store sessions
+* implement roles or permissions
+* integrate with OAuth providers
+* validate authentication credentials against your database
+* validate CSRF tokens against your application's state
+
+You control all of that.
