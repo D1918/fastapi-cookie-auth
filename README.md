@@ -310,10 +310,10 @@ For a more detailed explanation of cookie-based authentication in FastAPI, inclu
 
 The article covers:
 
-how cookie-based authentication works
-sessions vs. JWT-based authentication
-access and refresh tokens
-CSRF protection
-secure cookie configuration
-basic usage of fastapi-cookie-auth
-practical FastAPI examples
+* how cookie-based authentication works
+* sessions vs. JWT-based authentication
+* access and refresh tokens
+* CSRF protection
+* secure cookie configuration
+* basic usage of fastapi-cookie-auth
+* practical FastAPI examples
