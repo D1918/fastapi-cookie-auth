@@ -302,4 +302,18 @@ This package is intentionally not a complete authentication framework. It provid
 
 You control all of that.
 
-### Medium article about cookie-based authentication in FastAPI and the basic usage of fastapi-cookie-auth - https://medium.com/@dos1918/secure-fastapi-cookie-authentication-made-stupidly-simple-e6a81826b8e7
+## Further Reading
+
+For a more detailed explanation of cookie-based authentication in FastAPI, including the concepts behind it and practical examples, see the accompanying Medium article:
+
+### Secure FastAPI Cookie Authentication Made Stupidly Simple
+
+The article covers:
+
+how cookie-based authentication works
+sessions vs. JWT-based authentication
+access and refresh tokens
+CSRF protection
+secure cookie configuration
+basic usage of fastapi-cookie-auth
+practical FastAPI examples
