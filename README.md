@@ -306,7 +306,7 @@ You control all of that.
 
 For a more detailed explanation of cookie-based authentication in FastAPI, including the concepts behind it and practical examples, see the accompanying Medium article:
 
-### Secure FastAPI Cookie Authentication Made Stupidly Simple
+### [Secure FastAPI Cookie Authentication Made Stupidly Simple](https://medium.com/@dos1918/secure-fastapi-cookie-authentication-made-stupidly-simple-e6a81826b8e7)
 
 The article covers:
 
