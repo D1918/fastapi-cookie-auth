@@ -302,4 +302,4 @@ This package is intentionally not a complete authentication framework. It provid
 
 You control all of that.
 
-Medium article about cookie-based authentication in FastAPI and the basic usage of fastapi-cookie-auth - https://medium.com/@dos1918/secure-fastapi-cookie-authentication-made-stupidly-simple-e6a81826b8e7
+### Medium article about cookie-based authentication in FastAPI and the basic usage of fastapi-cookie-auth - https://medium.com/@dos1918/secure-fastapi-cookie-authentication-made-stupidly-simple-e6a81826b8e7
